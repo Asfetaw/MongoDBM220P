@@ -47,8 +47,11 @@ def get_db():
         MFLIX_DB_URI,
         # TODO: Connection Pooling
         # Set the maximum connection pool size to 50 active connections.
+        maxPoolSize=50,
         # TODO: Timeouts
         # Set the write timeout limit to 2500 milliseconds.
+        connectTimeoutMS=2500,
+        wTimeoutMS=2500
         )[MFLIX_DB_NAME]
     return db
 
@@ -298,8 +301,9 @@ def get_movie(id):
         return movie
 
     # TODO: Error Handling
-    # If an invalid ID is passed to `get_movie`, it should return None.
-    except (StopIteration) as _:
+    # If an invalid ID is passed to `get_movie`, it should return None.InvalidId
+    #except (StopIteration) as _:
+    except InvalidId as _:
 
         """
         Ticket: Error Handling
@@ -354,12 +358,13 @@ def add_comment(movie_id, user, comment, date):
     # Construct the comment document to be inserted into MongoDB.
    
     
-    comment_doc = { 
-        "name": user.name, 
-        "email" :user.email, 
-        "movie_id":movie_id,
-        "text": comment,
-        "date": date}
+    comment_doc = {
+        "name":user.name,
+        "email":user.email,
+        "movie_id":ObjectId(movie_id),
+        "text":comment,
+        "date":date
+        }
     return db.comments.insert_one(comment_doc)
 
 
@@ -373,8 +378,8 @@ def update_comment(comment_id, user_email, text, date):
     # Use the user_email and comment_id to select the proper comment, then
     # update the "text" and "date" of the selected comment.
     response = db.comments.update_one(
-        { "email": user_email , "comment.id":comment_id},
-        { "$set": { "comment.text": text, "date":date } }
+        { "email": user_email , "_id":ObjectId(comment_id)},
+        { "$set": { "text": text, "date":date } }
     )
 
     return response
@@ -395,7 +400,9 @@ def delete_comment(comment_id, user_email):
 
     # TODO: Delete Comments
     # Use the user_email and comment_id to delete the proper comment.
-    response = db.comments.delete_one( { "_id": ObjectId(comment_id) ,"email":user_email} )
+    response = db.comments.delete_one(
+        { "_id": ObjectId(comment_id) ,"email":user_email}
+        )
     return response
 
 

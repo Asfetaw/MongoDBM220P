@@ -41,8 +41,8 @@ def test_add_comment_should_be_implemented(client):
     # this test serves to do that
     result = add_comment(movie_id, user, comment['text'], now)
     comments = get_movie(movie_id).get('comments')
-    assert comments[0].get('_id') == result.inserted_id
-    assert comments[0].get('text') == comment['text']
+    assert comments[-1].get('_id') == result.inserted_id
+    assert comments[-1].get('text') == comment['text']
     comment['id'] = result.inserted_id
 
 

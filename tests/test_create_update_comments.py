@@ -38,8 +38,8 @@ def test_add_comment(client):
     assert result.inserted_id is not None
 
     comments = get_movie(movie_id).get('comments')
-    assert comments[0].get('_id') == result.inserted_id
-    assert comments[0].get('text') == comment['text']
+    assert comments[-1].get('_id') == result.inserted_id
+    assert comments[-1].get('text') == comment['text']
     comment['id'] = result.inserted_id
 
 
@@ -50,7 +50,7 @@ def test_update_comment(client):
 
     comments = get_movie(movie_id).get('comments')
     assert result.raw_result.get('nModified') == 1
-    assert comments[0].get('text') == 'foo foo foo'
+    assert comments[-1].get('text') == 'foo foo foo'
 
 
 @pytest.mark.create_update_comments
